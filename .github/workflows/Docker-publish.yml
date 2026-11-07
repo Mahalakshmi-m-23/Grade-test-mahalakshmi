@@ -1,3 +1,4 @@
+
 name: Build and Push Docker Image
 
 on:
@@ -26,5 +27,22 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/student-grade-calculator:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/student-grade-calculator:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/Grade-test-mahalakshmi:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/Grade-test-mahalakshmi:${{ github.sha }}
+
+  verify-dockerhub:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull image from Docker Hub
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Grade-test-mahalakshmi:${{ github.sha }}
+
+      - name: Verify image
+        run: docker image inspect ${{ secrets.DOCKERHUB_USERNAME }}/Grade-test-mahalakshmi:${{ github.sha }}
